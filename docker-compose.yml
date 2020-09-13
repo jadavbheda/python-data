@@ -1,0 +1,18 @@
+version: '2.3'
+services:
+  python-data:
+    build:
+      context: .
+      target: build
+    volumes:
+      - ./app:/opt/app
+
+  validate:
+    build:
+      context: .
+      target: validate
+    volumes:
+      - ./app:/opt/app
+      - ./tests:/opt/tests
+      - ./setup.cfg:/opt/setup.cfg
+      - ./requirements-dev.txt:/tmp/requirements-dev.txt
