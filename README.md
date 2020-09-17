@@ -22,8 +22,6 @@ Clone this repo, then build the image and enter a shell in that image:
 ### Validation Steps
 
     make build-validate
-    
-	docker-compose build validate
 
     make test # (runs pytest)	
 
