@@ -1,22 +1,9 @@
 """FWF parser
 """
-
-import sys
-import logging as log
 import csv
+import logging
 
-from utils import fw_config as config
-
-# TODO - move logger in single file
-ROOT = log.getLogger()
-ROOT.setLevel(log.INFO)
-
-if not ROOT.hasHandlers():
-    HANDLER = log.StreamHandler(sys.stdout)
-    HANDLER.setLevel(log.INFO)
-    FORMATTER = log.Formatter('%(asctime)s:%(name)s:%(levelname)s: %(message)s')
-    HANDLER.setFormatter(FORMATTER)
-    ROOT.addHandler(HANDLER)
+logger = logging.getLogger()
 
 
 class FWFParser(object):
@@ -36,9 +23,14 @@ class FWFParser(object):
 
     That mean once reading bytes from FWF we need decode('cp1252')
 
-    reference - http://xahlee.info/python/charset_encoding.html
+    references -
+        http://xahlee.info/python/charset_encoding.html
+        https://towardsdatascience.com/a-guide-to-unicode-utf-8-and-strings-in-python-757a232db95c
+        https://nedbatchelder.com/text/unipain.html
+        http://string-functions.com/encodingtable.aspx?encoding=65001&decoding=1252
     """
-    def __init__(self, fwf_file, csv_file, columns, fwf_encoding='cp1252', csv_encoding='utf-8'):
+
+    def __init__(self, fwf_file, csv_file, columns, fwf_encoding="cp1252", csv_encoding="utf-8"):
         """
         FWFParser class parses FWF and provids method to convert it to CSV
 
@@ -57,8 +49,8 @@ class FWFParser(object):
         self.fwf_file = fwf_file
         self.csv_file = csv_file
         self.offsets = columns
-        self.fwf_encoding = 'cp1252' if fwf_encoding == 'windows-1252' else fwf_encoding
-        self.csv_encoding = 'cp1252' if csv_encoding == 'windows-1252' else csv_encoding
+        self.fwf_encoding = "cp1252" if fwf_encoding == "windows-1252" else fwf_encoding
+        self.csv_encoding = "cp1252" if csv_encoding == "windows-1252" else csv_encoding
 
         # calling internal parsing method
         self.content = self._parser()
@@ -78,13 +70,14 @@ class FWFParser(object):
         :return:
         """
         with open(self.fwf_file, encoding=self.fwf_encoding) as _fh:
+
             for line_number, line in enumerate(_fh):
                 if line_number == 0:
-                    # ignore header row
+                    # ignore header row -- assuming FWF file always going to contain the header row
                     continue
 
                 # TODO - assuming line ending in \r\n but there has to be more generic way of doing it
-                raw_line = line.rstrip('\r\n')
+                raw_line = line.rstrip("\r\n")
                 yield self._parse_line(raw_line)
 
     def _parse_line(self, line):
@@ -97,7 +90,7 @@ class FWFParser(object):
         for column, offset in self.offsets:
             # TODO- initial thought to use `struct` because its faster, but seems like it can't operate on non-ascii
             # so for now not wasting time and using slicing
-            parsed_line.update({column: line[start_index:start_index+offset].rstrip()})
+            parsed_line.update({column: line[start_index : start_index + offset].rstrip()})  # NOQA
             start_index += offset
 
         return parsed_line
@@ -108,10 +101,10 @@ class FWFParser(object):
         :param write_header: if true
         :return:
         """
-        log.info('Writing to CSV file: {}'.format(self.csv_file))
-        log.info('Headers : {}'.format(self._get_header()))
+        logger.info("Writing to CSV file: {}".format(self.csv_file))
+        logger.info("Headers : {}".format(self._get_header()))
         counter = 0
-        with open(self.csv_file, 'w', newline='', encoding=self.csv_encoding) as csv_file:
+        with open(self.csv_file, "w", newline="", encoding=self.csv_encoding) as csv_file:
             writer = csv.DictWriter(csv_file, fieldnames=self._get_header())
             if write_header:
                 writer.writeheader()
@@ -120,6 +113,6 @@ class FWFParser(object):
                 writer.writerow(line)
                 counter += 1
 
-        log.info('CSV records written to "%s": %d', csv_file, counter)
+        logger.info('CSV records written to "%s": %d', csv_file, counter)
 
         return counter

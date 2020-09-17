@@ -1,21 +1,29 @@
 #!/usr/bin/env python
 import os
+import logging
 
 from utils import fw_config as config
 from parser import fw_parser as parser
 from generator import fw_generator as generator
 
+# logger conf
+logger = logging.getLogger()
+handler = logging.StreamHandler()
+formatter = logging.Formatter("%(asctime)s %(name)-12s %(levelname)-8s %(message)s")
+handler.setFormatter(formatter)
+logger.addHandler(handler)
+logger.setLevel(logging.INFO)
+
 # globals
-# All file paths config below (could have read it from the config file
+# All file paths config below (could have read it from the config file)
 
 # problem-1 globals
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__)) # `app` is our project root
-FW_SPEC = os.path.join(PROJECT_ROOT, 'data/spec.json')
-FW_FILE = os.path.join(PROJECT_ROOT, 'data/fwf.txt')
-CSV_FILE = os.path.join(PROJECT_ROOT, 'data/converted.csv')
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))  # `app` is our project root
+FW_SPEC = os.path.join(PROJECT_ROOT, "data/spec.json")
+FW_FILE = os.path.join(PROJECT_ROOT, "data/fwf.txt")
+CSV_FILE = os.path.join(PROJECT_ROOT, "data/converted.csv")
 
-#problem-2 globals
-# TBD
+# problem-2 globals
 
 
 def problem_1_fix_width_to_csv():
@@ -35,22 +43,22 @@ def problem_1_fix_width_to_csv():
     # get fix width spec in conf python object
     conf = config.Config(FW_SPEC)
 
-    print("Generating Fix width file (windows-1252) .... [{}]".format(FW_FILE))
-    fwf_generator = generator.FixedWidthFileWriter(FW_FILE,
-                                                   columns=conf.fixed_width_columns,
-                                                   encoding=conf.fix_width_encoding
-                                                   )
+    logger.info("Generating Fix width file (windows-1252) .... [{}]".format(FW_FILE))
+    fwf_generator = generator.FixedWidthFileWriter(
+        FW_FILE, columns=conf.fixed_width_columns, encoding=conf.fix_width_encoding
+    )
     fwf_generator.write_file()
 
-    print("Parsing Fix width file....[{}]".format(FW_FILE))
-    fwf_parser = parser.FWFParser(FW_FILE,
-                                  CSV_FILE,
-                                  columns=conf.fixed_width_columns,
-                                  fwf_encoding=conf.fix_width_encoding,
-                                  csv_encoding=conf.delimited_encoding
-                                  )
+    logger.info("Parsing Fix width file....[{}]".format(FW_FILE))
+    fwf_parser = parser.FWFParser(
+        FW_FILE,
+        CSV_FILE,
+        columns=conf.fixed_width_columns,
+        fwf_encoding=conf.fix_width_encoding,
+        csv_encoding=conf.delimited_encoding,
+    )
 
-    print("Generating CSV file...[{}]".format(CSV_FILE))
+    logger.info("Generating CSV file...[{}]".format(CSV_FILE))
     fwf_parser.dump_csv(write_header=conf.include_header)
 
 
@@ -59,7 +67,6 @@ def problem_2_data_processing():
     Wrapper to annonymise input data - planning to use Faker
     :return:
     """
-    # TBD -
     pass
 
 
@@ -70,5 +77,5 @@ def main():
     problem_1_fix_width_to_csv()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
