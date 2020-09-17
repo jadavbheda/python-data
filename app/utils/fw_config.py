@@ -30,20 +30,16 @@ class Config(object):
     """
 
     def __init__(self, config_file):
-        try:
-            with open(config_file) as f:
-                config = json.load(f)
 
-                self.columns = config.get("ColumnNames", [])
-                offset = config.get("Offsets", [])
-                self.offsets = [int(i) for i in offset] if offset else []
-                self.fix_width_encoding = config.get("FixedWidthEncoding", "utf-8")
-                self.delimited_encoding = config.get("DelimitedEncoding", "utf-8")
-                self.include_header = True if config.get("IncludeHeader", "True") == "True" else False
-        except TypeError as e:
-            raise e
-        except IOError as e:
-            raise e
+        with open(config_file) as f:
+            config = json.load(f)
+
+            self.columns = config.get("ColumnNames", [])
+            offset = config.get("Offsets", [])
+            self.offsets = [int(i) for i in offset] if offset else []
+            self.fix_width_encoding = config.get("FixedWidthEncoding", "utf-8")
+            self.delimited_encoding = config.get("DelimitedEncoding", "utf-8")
+            self.include_header = True if config.get("IncludeHeader", "True") == "True" else False
 
     @property
     def fixed_width_columns(self):
@@ -55,5 +51,4 @@ class Config(object):
 
 if __name__ == "__main__":
     import doctest
-
     doctest.testmod()
