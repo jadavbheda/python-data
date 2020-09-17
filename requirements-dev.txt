@@ -3,3 +3,4 @@ mypy
 flake8
 chardet
 pre-commit
+pytest-cov
