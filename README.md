@@ -1,10 +1,8 @@
-# python-data
+python-data
+=========================================================
 
 FWF to CSV converter using python, docker/docker-composer. 
 
-.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
-     :target: https://github.com/ambv/black
-     :alt: Black code style
 
 ## Local Development
 
